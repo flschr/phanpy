@@ -393,7 +393,7 @@ shortcuts .tab-bar[hidden] {
   }
 
   #app:has(#shortcuts .tab-bar:not([hidden]))
-    #home-page
+    :is(#home-page, #notifications-page)
     > .timeline-deck
     > header {
     display: none !important;
