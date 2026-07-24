@@ -22,7 +22,12 @@ import ListExclusiveBadge from './list-exclusive-badge';
 import MenuLink from './menu-link';
 import SubMenu2 from './submenu2';
 
-function NavMenu(props) {
+function NavMenu({
+  buttonLabel,
+  buttonIcon = 'menu',
+  buttonClass = 'button plain',
+  ...menuProps
+}) {
   const { t } = useLingui();
   const snapStates = useSnapshot(states);
   const { masto, instance, authenticated } = api();
@@ -39,7 +44,8 @@ function NavMenu(props) {
   const tabMenuHasProfile =
     snapStates.settings.shortcutsViewMode === 'tab-menu-bar' &&
     snapStates.shortcuts.some((pin) => pin.type === 'profile');
-  const showAvatarInButton = moreThanOneAccount && !tabMenuHasProfile;
+  const showAvatarInButton =
+    !buttonLabel && moreThanOneAccount && !tabMenuHasProfile;
 
   // Home = Following
   // But when in multi-column mode, Home becomes columns of anything
@@ -104,7 +110,7 @@ function NavMenu(props) {
       <button
         ref={buttonRef}
         type="button"
-        class={`button plain nav-menu-button ${
+        class={`${buttonClass} nav-menu-button ${
           showAvatarInButton ? 'with-avatar' : ''
         } ${menuState === 'open' ? 'active' : ''}`}
         style={{ position: 'relative' }}
@@ -127,7 +133,12 @@ function NavMenu(props) {
             squircle={currentAccount?.info?.bot}
           />
         )}
-        <Icon icon="menu" size={showAvatarInButton ? 's' : 'l'} alt={t`Menu`} />
+        <Icon
+          icon={buttonIcon}
+          size={showAvatarInButton ? 's' : 'l'}
+          alt={buttonLabel ? '' : t`Menu`}
+        />
+        {buttonLabel && <span>{buttonLabel}</span>}
       </button>
       <ControlledMenu
         menuClassName="nav-menu"
@@ -150,7 +161,7 @@ function NavMenu(props) {
         portal={{
           target: document.body,
         }}
-        {...props}
+        {...menuProps}
         overflow="auto"
         viewScroll="close"
         position="anchor"

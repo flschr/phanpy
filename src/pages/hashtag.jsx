@@ -154,6 +154,7 @@ function Hashtags({ media: mediaView, columnMode, ...props }) {
   }
 
   const [followUIState, setFollowUIState] = useState('default');
+  const [muteUIState, setMuteUIState] = useState('default');
   const [info, setInfo] = useState();
   // Get hashtag info
   useEffect(() => {
@@ -389,6 +390,47 @@ function Hashtags({ media: mediaView, columnMode, ...props }) {
                     <Trans>Media only</Trans>
                   </span>
                 </MenuItem>
+                <MenuDivider />
+              </>
+            )}
+            {hashtags.length === 1 && (
+              <>
+                <MenuConfirm
+                  subMenu
+                  confirmLabel={t`Mute #${hashtag} permanently?`}
+                  disabled={muteUIState === 'loading' || !currentAuthenticated}
+                  onClick={() => {
+                    setMuteUIState('loading');
+                    currentMasto.v2.filters
+                      .create({
+                        title: t`Muted #${hashtag}`,
+                        context: ['home', 'public'],
+                        expiresIn: null,
+                        keywordsAttributes: [
+                          {
+                            keyword: `#${hashtag}`,
+                            wholeWord: true,
+                          },
+                        ],
+                        filterAction: 'hide',
+                      })
+                      .then(() => {
+                        showToast(t`Muted #${hashtag} permanently`);
+                      })
+                      .catch((e) => {
+                        console.error(e);
+                        showToast(t`Unable to mute #${hashtag}`);
+                      })
+                      .finally(() => {
+                        setMuteUIState('default');
+                      });
+                  }}
+                >
+                  <Icon icon="mute" />{' '}
+                  <span>
+                    <Trans>Mute hashtag permanently</Trans>
+                  </span>
+                </MenuConfirm>
                 <MenuDivider />
               </>
             )}
