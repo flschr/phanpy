@@ -24,6 +24,7 @@ import MenuConfirm from './menu-confirm';
 import MenuLink from './menu-link';
 import Menu2 from './menu2';
 import Modal from './modal';
+import NavMenu from './nav-menu';
 import PrivateNoteSheet from './private-note-sheet';
 import SubMenu2 from './submenu2';
 import TranslatedBioSheet from './translated-bio-sheet';
@@ -900,15 +901,24 @@ function RelatedActions({
             <Loader abrupt />
           )}
           {currentAuthenticated && isSelf && standalone ? (
-            <button
-              type="button"
-              class="light"
-              onClick={() => {
-                setShowEditProfile(true);
-              }}
-            >
-              <Trans>Edit profile</Trans>
-            </button>
+            <>
+              <NavMenu
+                buttonClass="button light"
+                buttonIcon="gear"
+                buttonLabel={<Trans>Settings</Trans>}
+                direction="top"
+                align="end"
+              />
+              <button
+                type="button"
+                class="light"
+                onClick={() => {
+                  setShowEditProfile(true);
+                }}
+              >
+                <Trans>Edit profile</Trans>
+              </button>
+            </>
           ) : (
             !isSelf &&
             !!relationship &&

@@ -306,23 +306,6 @@ shortcuts .tab-bar[hidden] {
       box-shadow: none;
     }
   }
-  #shortcuts .tab-bar .tab-bar-menu {
-    position: absolute;
-    inset-block-start: env(safe-area-inset-top);
-    inset-inline-start: max(
-      8px,
-      env(safe-area-inset-left),
-      calc((100vw - var(--main-width)) / 2)
-    );
-    height: 44px;
-    display: flex;
-    align-items: center;
-    z-index: 1;
-  }
-  #shortcuts .tab-bar .tab-bar-menu .nav-menu-button {
-    min-width: 44px;
-    min-height: 44px;
-  }
   #shortcuts .tab-bar ul:before {
     content: '';
     margin: auto;

@@ -22,7 +22,6 @@ import Link from './link';
 import ListExclusiveBadge from './list-exclusive-badge';
 import MenuLink from './menu-link';
 import Menu2 from './menu2';
-import NavMenu from './nav-menu';
 import SubMenu2 from './submenu2';
 
 function ListsMenuContent({ lists }) {
@@ -215,9 +214,6 @@ function Shortcuts() {
               states.showShortcutsSettings = true;
             }}
           >
-            <div class="tab-bar-menu">
-              <NavMenu direction="bottom" align="start" />
-            </div>
             <ul>
               {formattedShortcuts.map(
                 ({ id, path, title, subtitle, icon, altIcon }, i) => {
