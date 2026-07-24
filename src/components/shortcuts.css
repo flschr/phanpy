@@ -369,20 +369,6 @@ shortcuts .tab-bar[hidden] {
       user-select: none;
     }
 
-    #home-page > .timeline-deck > header {
-      height: 0;
-      min-height: 0;
-
-      .header-grid {
-        display: none;
-      }
-
-      .updates-button {
-        top: 8px;
-        margin-top: 0;
-      }
-    }
-
     .timeline-deck > header .nav-menu-button {
       display: none;
     }
@@ -404,5 +390,12 @@ shortcuts .tab-bar[hidden] {
       opacity: 1;
       box-shadow: none;
     }
+  }
+
+  #app:has(#shortcuts .tab-bar:not([hidden]))
+    #home-page
+    > .timeline-deck
+    > header {
+    display: none !important;
   }
 }

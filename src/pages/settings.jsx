@@ -309,6 +309,26 @@ function Settings({ onClose }) {
                     </option>
                   </select>
                 </li>
+                <li class="block">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={snapStates.settings.quietReplies}
+                      onChange={(e) => {
+                        states.settings.quietReplies = e.target.checked;
+                      }}
+                    />{' '}
+                    <Trans>Post public replies quietly</Trans>
+                  </label>
+                  <div class="sub-section insignificant">
+                    <small>
+                      <Trans>
+                        Replies remain publicly accessible, but are omitted from
+                        public timelines.
+                      </Trans>
+                    </small>
+                  </div>
+                </li>
                 {supportsNativeQuote() && (
                   <li>
                     <label for="posting-quote-policy-field">

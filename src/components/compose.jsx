@@ -495,9 +495,15 @@ function Compose({
           focusTextarea();
         }
       }
+      const defaultVisibility =
+        prefs['posting:default:visibility']?.toLowerCase();
       setVisibility(
-        visibility === 'public' && prefs['posting:default:visibility']
-          ? prefs['posting:default:visibility'].toLowerCase()
+        visibility === 'public'
+          ? ['private', 'direct'].includes(defaultVisibility)
+            ? defaultVisibility
+            : states.settings.quietReplies
+              ? 'unlisted'
+              : defaultVisibility || visibility
           : visibility,
       );
       setLanguage(
