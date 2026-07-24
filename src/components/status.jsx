@@ -64,7 +64,7 @@ import LazyShazam from './lazy-shazam';
 import Link from './link';
 import Loader from './loader';
 import MathBlock from './math-block';
-import Media, { isMediaCaptionLong } from './media';
+import Media from './media';
 import MediaFirstContainer from './media-first-container';
 import MenuConfirm from './menu-confirm';
 import MenuLink from './menu-link';
@@ -1934,67 +1934,21 @@ function Status({
     0,
     isSizeLarge ? undefined : 4,
   );
-  const showMultipleMediaCaptions =
-    mediaAttachments.length > 1 &&
-    displayedMediaAttachments.some(
-      (media) => !!media.description && !isMediaCaptionLong(media.description),
-    );
-  const captionChildren = useMemo(() => {
-    if (!showMultipleMediaCaptions) return null;
-    const attachments = [];
-    displayedMediaAttachments.forEach((media, i) => {
-      if (!media.description) return;
-      const index = attachments.findIndex(
-        (attachment) => attachment.media.description === media.description,
-      );
-      if (index === -1) {
-        attachments.push({
-          media,
-          indices: [i],
-        });
-      } else {
-        attachments[index].indices.push(i);
-      }
-    });
-    return attachments.map(({ media, indices }) => (
-      <div
-        key={media.id}
-        data-caption-index={indices.map((i) => i + 1).join(' ')}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          states.showMediaAlt = {
-            alt: media.description,
-            lang: language,
-          };
-        }}
-        title={media.description}
-      >
-        <sup>{indices.map((i) => i + 1).join(' ')}</sup> {media.description}
-      </div>
-    ));
-
-    // return displayedMediaAttachments.map(
-    //   (media, i) =>
-    //     !!media.description && (
-    //       <div
-    //         key={media.id}
-    //         data-caption-index={i + 1}
-    //         onClick={(e) => {
-    //           e.preventDefault();
-    //           e.stopPropagation();
-    //           states.showMediaAlt = {
-    //             alt: media.description,
-    //             lang: language,
-    //           };
-    //         }}
-    //         title={media.description}
-    //       >
-    //         <sup>{i + 1}</sup> {media.description}
-    //       </div>
-    //     ),
-    // );
-  }, [showMultipleMediaCaptions, displayedMediaAttachments, language]);
+  const [expandedMediaAltID, setExpandedMediaAltID] = useState(null);
+  const expandedMediaAlt = displayedMediaAttachments.find(
+    (media) => media.id === expandedMediaAltID,
+  );
+  const captionChildren = expandedMediaAlt ? (
+    <div
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setExpandedMediaAltID(null);
+      }}
+    >
+      {expandedMediaAlt.description}
+    </div>
+  ) : null;
 
   const isThread = useMemo(() => {
     return (
@@ -2707,6 +2661,7 @@ function Status({
                             media={media}
                             autoAnimate
                             showCaption
+                            toggleInlineDescription
                             allowLongerCaption={!content || isSizeLarge}
                             lang={language}
                             to={`/${instance}/s/${id}?${
@@ -2724,7 +2679,7 @@ function Status({
                   ) : (
                     <MultipleMediaFigure
                       lang={language}
-                      enabled={showMultipleMediaCaptions}
+                      enabled={mediaAttachments.length > 1 && !!captionChildren}
                       captionChildren={captionChildren}
                     >
                       <div
@@ -2741,14 +2696,20 @@ function Status({
                             media={media}
                             autoAnimate={isSizeLarge}
                             showCaption={mediaAttachments.length === 1}
+                            toggleInlineDescription={
+                              mediaAttachments.length === 1
+                            }
                             allowLongerCaption={
                               !content && mediaAttachments.length === 1
                             }
                             lang={language}
-                            altIndex={
-                              showMultipleMediaCaptions &&
-                              !!media.description &&
-                              i + 1
+                            onAltToggle={
+                              mediaAttachments.length > 1
+                                ? () =>
+                                    setExpandedMediaAltID((expandedID) =>
+                                      expandedID === media.id ? null : media.id,
+                                    )
+                                : undefined
                             }
                             to={`/${instance}/s/${id}?${
                               withinContext ? 'media' : 'media-only'

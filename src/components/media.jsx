@@ -34,7 +34,7 @@ audio = Audio track
 const dataAltLabel = 'ALT';
 const AltBadge = (props) => {
   const { t } = useLingui();
-  const { alt, lang, index, ...rest } = props;
+  const { alt, lang, onToggle, ...rest } = props;
   if (!alt || !alt.trim()) return null;
   return (
     <button
@@ -44,6 +44,10 @@ const AltBadge = (props) => {
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
+        if (onToggle) {
+          onToggle();
+          return;
+        }
         states.showMediaAlt = {
           alt,
           lang,
@@ -52,7 +56,6 @@ const AltBadge = (props) => {
       title={t`Media description`}
     >
       {dataAltLabel}
-      {!!index && <sup>{index}</sup>}
     </button>
   );
 };
@@ -90,10 +93,11 @@ function Media({
   autoAnimate,
   showCaption,
   allowLongerCaption,
-  altIndex,
   checkAspectRatio = true,
   onClick,
   autoplay = false,
+  toggleInlineDescription = false,
+  onAltToggle,
 }) {
   let {
     id,
@@ -215,16 +219,25 @@ function Media({
           ...averageColorStyle,
         };
 
+  const [inlineDescriptionExpanded, setInlineDescriptionExpanded] =
+    useState(false);
   const longDesc = isMediaCaptionLong(description);
-  let showInlineDesc =
-    !!showCaption && !showOriginal && !!description && !longDesc;
+  let showInlineDesc = toggleInlineDescription
+    ? inlineDescriptionExpanded
+    : !!showCaption && !showOriginal && !!description && !longDesc;
   if (
+    !toggleInlineDescription &&
     allowLongerCaption &&
     !showInlineDesc &&
     description?.length <= MEDIA_CAPTION_LIMIT_LONGER
   ) {
     showInlineDesc = true;
   }
+  const handleAltToggle = onAltToggle
+    ? onAltToggle
+    : toggleInlineDescription
+      ? () => setInlineDescriptionExpanded((expanded) => !expanded)
+      : undefined;
   const Figure = !showInlineDesc
     ? Fragment
     : (props) => {
@@ -239,6 +252,10 @@ function Media({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (toggleInlineDescription) {
+                  setInlineDescriptionExpanded(false);
+                  return;
+                }
                 states.showMediaAlt = {
                   alt: description,
                   lang,
@@ -549,7 +566,11 @@ function Media({
                 }}
               />
               {!showInlineDesc && (
-                <AltBadge alt={description} lang={lang} index={altIndex} />
+                <AltBadge
+                  alt={description}
+                  lang={lang}
+                  onToggle={handleAltToggle}
+                />
               )}
             </>
           )}
@@ -799,7 +820,11 @@ function Media({
             </>
           )}
           {!showOriginal && !showInlineDesc && (
-            <AltBadge alt={description} lang={lang} index={altIndex} />
+            <AltBadge
+              alt={description}
+              lang={lang}
+              onToggle={handleAltToggle}
+            />
           )}
         </Parent>
       </Figure>
@@ -865,7 +890,11 @@ function Media({
                 <Icon icon="play" size="xl" alt="▶" />
               </div>
               {!showInlineDesc && (
-                <AltBadge alt={description} lang={lang} index={altIndex} />
+                <AltBadge
+                  alt={description}
+                  lang={lang}
+                  onToggle={handleAltToggle}
+                />
               )}
             </>
           )}

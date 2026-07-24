@@ -18,6 +18,31 @@
       margin: 0;
     }
 
+    .emoji-type-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-top: 8px;
+      padding: 3px;
+      border-radius: 10px;
+      background-color: var(--bg-faded-color);
+
+      button {
+        min-height: 36px;
+        padding: 4px 10px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--text-insignificant-color);
+
+        &.selected {
+          background-color: var(--bg-color);
+          color: var(--text-color);
+          box-shadow: 0 1px 4px -2px var(--drop-shadow-color);
+        }
+      }
+    }
+
     form {
       margin-top: 8px;
 
@@ -34,6 +59,37 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+  }
+
+  .unicode-emoji-picker {
+    display: grid;
+    min-height: 0;
+    flex: 1;
+
+    .loader-container {
+      place-self: center;
+    }
+
+    emoji-picker {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      border: 0;
+      --background: var(--bg-color);
+      --border-color: var(--divider-color);
+      --input-border-color: var(--outline-color);
+      --input-font-color: var(--text-color);
+      --input-placeholder-color: var(--text-insignificant-color);
+      --category-font-color: var(--text-insignificant-color);
+      --indicator-color: var(--link-color);
+      --outline-color: var(--link-color);
+      --button-hover-background: var(--bg-faded-color);
+      --button-active-background: var(--bg-blur-color);
+
+      &.hidden {
+        visibility: hidden;
+      }
+    }
   }
 
   .size-range {

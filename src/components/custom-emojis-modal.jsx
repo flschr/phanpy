@@ -16,6 +16,7 @@ import store from '../utils/store';
 
 import Icon from './icon';
 import Loader from './loader';
+import UnicodeEmojiPicker from './unicode-emoji-picker';
 
 const CUSTOM_EMOJIS_COUNT = 100;
 const EMOJI_SIZE_MIN = 1;
@@ -123,6 +124,9 @@ function CustomEmojisModal({
   const customEmojisList = useRef([]);
   const [customEmojis, setCustomEmojis] = useState([]);
   const [customInstance, setCustomInstance] = useState(null);
+  const [emojiType, setEmojiType] = useState(
+    defaultSearchTerm ? 'custom' : 'unicode',
+  );
   const instance = customInstance || propInstance;
 
   const recentlyUsedCustomEmojis = useMemo(
@@ -130,6 +134,8 @@ function CustomEmojisModal({
   );
   const searcherRef = useRef();
   useEffect(() => {
+    if (emojiType !== 'custom') return;
+
     setUIState('loading');
     (async () => {
       try {
@@ -143,7 +149,7 @@ function CustomEmojisModal({
         console.error(e);
       }
     })();
-  }, [instance]);
+  }, [emojiType, instance]);
 
   const customEmojisCatList = useMemo(() => {
     const shortcodeSet = new Set(customEmojis.map((e) => e.shortcode));
@@ -265,7 +271,7 @@ function CustomEmojisModal({
         inputRef.current.selectionEnd = inputRef.current.value.length;
       }
     }
-  }, []);
+  }, [emojiType]);
 
   const hasCustomEmojis = !!customEmojis?.length;
 
@@ -285,11 +291,11 @@ function CustomEmojisModal({
       <header>
         <div>
           <b>
-            <Trans>Custom emojis</Trans>
+            <Trans>Emoji</Trans>
           </b>{' '}
-          {uiState === 'loading' ? (
+          {emojiType === 'custom' && uiState === 'loading' ? (
             <Loader />
-          ) : (
+          ) : emojiType === 'custom' ? (
             <small class="insignificant">
               {' '}
               •{' '}
@@ -315,9 +321,27 @@ function CustomEmojisModal({
                 instance
               )}
             </small>
-          )}
+          ) : null}
         </div>
-        {hasCustomEmojis && (
+        <div class="emoji-type-tabs">
+          <button
+            type="button"
+            class={emojiType === 'unicode' ? 'selected' : ''}
+            aria-pressed={emojiType === 'unicode'}
+            onClick={() => setEmojiType('unicode')}
+          >
+            <Trans>Emoji</Trans>
+          </button>
+          <button
+            type="button"
+            class={emojiType === 'custom' ? 'selected' : ''}
+            aria-pressed={emojiType === 'custom'}
+            onClick={() => setEmojiType('custom')}
+          >
+            <Trans>Custom emojis</Trans>
+          </button>
+        </div>
+        {emojiType === 'custom' && hasCustomEmojis && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -344,7 +368,14 @@ function CustomEmojisModal({
         )}
       </header>
       <main ref={scrollableRef}>
-        {hasCustomEmojis ? (
+        {emojiType === 'unicode' ? (
+          <UnicodeEmojiPicker
+            onSelect={(emoji) => {
+              onSelect?.(emoji);
+              onClose?.();
+            }}
+          />
+        ) : hasCustomEmojis ? (
           <>
             {matches !== null ? (
               <ul class="custom-emojis-matches custom-emojis-list">

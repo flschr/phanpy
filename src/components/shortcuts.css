@@ -306,6 +306,23 @@ shortcuts .tab-bar[hidden] {
       box-shadow: none;
     }
   }
+  #shortcuts .tab-bar .tab-bar-menu {
+    position: absolute;
+    inset-block-start: env(safe-area-inset-top);
+    inset-inline-start: max(
+      8px,
+      env(safe-area-inset-left),
+      calc((100vw - var(--main-width)) / 2)
+    );
+    height: 44px;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+  }
+  #shortcuts .tab-bar .tab-bar-menu .nav-menu-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
   #shortcuts .tab-bar ul:before {
     content: '';
     margin: auto;
@@ -345,15 +362,47 @@ shortcuts .tab-bar[hidden] {
     text-align: left;
     line-height: 1;
   }
-  #app:has(#home-page):not(:has(#home-page ~ .deck-container)):has(
-      header[hidden]
-    )
-    #shortcuts
-    .tab-bar,
-  #app:has(#home-page ~ .deck-container header[hidden]) #shortcuts .tab-bar,
-  shortcuts .tab-bar[hidden] {
-    transform: translateY(-150%);
-    pointer-events: none;
-    user-select: none;
+  #app[data-shortcuts-view-mode='tab-menu-bar'] {
+    #shortcuts .tab-bar {
+      transform: none !important;
+      pointer-events: auto !important;
+      user-select: none;
+    }
+
+    #home-page > .timeline-deck > header {
+      height: 0;
+      min-height: 0;
+
+      .header-grid {
+        display: none;
+      }
+
+      .updates-button {
+        top: 8px;
+        margin-top: 0;
+      }
+    }
+
+    .timeline-deck > header .nav-menu-button {
+      display: none;
+    }
+
+    #compose-button {
+      top: env(safe-area-inset-top);
+      bottom: auto;
+      inset-inline-end: max(
+        8px,
+        env(safe-area-inset-right),
+        calc((100vw - var(--main-width)) / 2)
+      );
+      min-width: 44px;
+      min-height: 44px;
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 101;
+      transform: none;
+      opacity: 1;
+      box-shadow: none;
+    }
   }
 }

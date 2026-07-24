@@ -1051,7 +1051,6 @@ function Compose({
             // />
             <AccountBlock
               account={currentAccountInfo}
-              accountInstance={currentAccount.instanceURL}
               hideDisplayName
               useAvatarStatic
             />
