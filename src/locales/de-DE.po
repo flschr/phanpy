@@ -4499,6 +4499,14 @@ msgstr "Standardsichtbarkeit aktualisiert"
 msgid "Failed to update default visibility"
 msgstr "Fehler beim Aktualisieren der Standardsichtbarkeit"
 
+#: src/pages/settings.jsx:321
+msgid "Post public replies quietly"
+msgstr "Öffentliche Antworten still posten"
+
+#: src/pages/settings.jsx:325
+msgid "Replies remain publicly accessible, but are omitted from public timelines."
+msgstr "Antworten bleiben öffentlich erreichbar, erscheinen aber nicht in öffentlichen Timelines."
+
 #: src/pages/settings.jsx:366
 msgid "Synced to your server's settings. <0>Go to your server ({instance}) for more settings.</0>"
 msgstr ""
@@ -4937,4 +4945,3 @@ msgstr "Ein Beitragsentwurf ist derzeit minimiert. Posten oder verwerfen Sie ihn
 #: src/utils/show-compose.js:21
 msgid "A post is currently open. Post or discard it before creating a new one."
 msgstr "Ein Beitrag ist derzeit offen. Posten oder verwerfen Sie ihn, bevor Sie einen neuen erstellen."
-

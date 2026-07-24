@@ -82,7 +82,8 @@ const states = proxy({
     contentTranslationTargetLanguage: null,
     contentTranslationHideLanguages: [],
     contentTranslationAutoInline: false,
-    shortcutSettingsCloudImportExport: false,
+    shortcutSettingsCloudImportExport: true,
+    quietReplies: true,
     mediaAltGenerator: false,
     composerGIFPicker: false,
     cloakMode: false,
@@ -119,7 +120,9 @@ export function initStates() {
   states.settings.contentTranslationAutoInline =
     store.account.get('settings-contentTranslationAutoInline') ?? false;
   states.settings.shortcutSettingsCloudImportExport =
-    store.account.get('settings-shortcutSettingsCloudImportExport') ?? false;
+    store.account.get('settings-shortcutSettingsCloudImportExport') ?? true;
+  states.settings.quietReplies =
+    store.account.get('settings-quietReplies') ?? true;
   states.settings.mediaAltGenerator =
     store.account.get('settings-mediaAltGenerator') ?? false;
   states.settings.composerGIFPicker =
@@ -161,6 +164,9 @@ subscribe(states, (changes) => {
     }
     if (path.join('.') === 'settings.shortcutSettingsCloudImportExport') {
       store.account.set('settings-shortcutSettingsCloudImportExport', !!value);
+    }
+    if (path.join('.') === 'settings.quietReplies') {
+      store.account.set('settings-quietReplies', !!value);
     }
     if (path.join('.') === 'settings.contentTranslationTargetLanguage') {
       console.log('SET', value);
