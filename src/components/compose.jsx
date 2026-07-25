@@ -29,6 +29,7 @@ import states, { saveStatus } from '../utils/states';
 import store from '../utils/store';
 import {
   getAPIVersions,
+  getAccounts,
   getCurrentAccount,
   getCurrentAccountNS,
   getCurrentInstanceConfiguration,
@@ -183,6 +184,7 @@ function Compose({
 
   const currentAccount = useMemo(getCurrentAccount, []);
   const currentAccountInfo = currentAccount.info;
+  const showComposeTop = !inline || getAccounts().length > 1;
 
   const configuration = getCurrentInstanceConfiguration();
   console.log('⚙️ Configuration', configuration);
@@ -1048,26 +1050,98 @@ function Compose({
         tabIndex={-1}
         class={`${standalone ? 'standalone' : ''} ${inline ? 'inline' : ''}`}
       >
-        <div class="compose-top">
-          {currentAccountInfo?.avatarStatic && (
-            // <Avatar
-            //   url={currentAccountInfo.avatarStatic}
-            //   size="xl"
-            //   alt={currentAccountInfo.username}
-            //   squircle={currentAccountInfo?.bot}
-            // />
-            <AccountBlock
-              account={currentAccountInfo}
-              hideDisplayName
-              useAvatarStatic
-            />
-          )}
-          {!standalone && !inline ? (
-            <span class="compose-controls">
-              {!isPopOutNotSupported && (
+        {showComposeTop && (
+          <div class="compose-top">
+            {currentAccountInfo?.avatarStatic && (
+              // <Avatar
+              //   url={currentAccountInfo.avatarStatic}
+              //   size="xl"
+              //   alt={currentAccountInfo.username}
+              //   squircle={currentAccountInfo?.bot}
+              // />
+              <AccountBlock
+                account={currentAccountInfo}
+                hideDisplayName
+                useAvatarStatic
+              />
+            )}
+            {!standalone && !inline ? (
+              <span class="compose-controls">
+                {!isPopOutNotSupported && (
+                  <button
+                    type="button"
+                    class="plain4 pop-button"
+                    disabled={uiState === 'loading'}
+                    onClick={() => {
+                      // If there are non-ID media attachments (not yet uploaded), show confirmation dialog because they are not going to be passed to the new window
+                      // const containNonIDMediaAttachments =
+                      //   mediaAttachments.length > 0 &&
+                      //   mediaAttachments.some((media) => !media.id);
+                      // if (containNonIDMediaAttachments) {
+                      //   const yes = confirm(
+                      //     'You have media attachments that are not yet uploaded. Opening a new window will discard them and you will need to re-attach them. Are you sure you want to continue?',
+                      //   );
+                      //   if (!yes) {
+                      //     return;
+                      //   }
+                      // }
+
+                      // const mediaAttachmentsWithIDs = mediaAttachments.filter(
+                      //   (media) => media.id,
+                      // );
+
+                      const newWin = openCompose({
+                        editStatus,
+                        replyToStatus,
+                        draftStatus: {
+                          uid: UID.current,
+                          status: textareaRef.current.value,
+                          spoilerText: spoilerTextRef.current.value,
+                          visibility,
+                          language,
+                          sensitive,
+                          poll,
+                          mediaAttachments,
+                          scheduledAt,
+                        },
+                        quoteStatus: currentQuoteStatus,
+                      });
+
+                      if (!newWin) {
+                        return;
+                      }
+
+                      onClose();
+                    }}
+                  >
+                    <Icon icon="popout" alt={t`Pop out`} />
+                  </button>
+                )}
                 <button
                   type="button"
-                  class="plain4 pop-button"
+                  class="plain4 min-button"
+                  onClick={onMinimize}
+                >
+                  <Icon icon="minimize" alt={t`Minimize`} />
+                </button>{' '}
+                <button
+                  type="button"
+                  class="plain4 close-button"
+                  disabled={uiState === 'loading'}
+                  onClick={() => {
+                    if (confirmClose()) {
+                      onClose();
+                    }
+                  }}
+                >
+                  <Icon icon="x" alt={t`Close`} />
+                </button>
+              </span>
+            ) : !inline ? (
+              hasOpener && (
+                <button
+                  type="button"
+                  class="light pop-button"
                   disabled={uiState === 'loading'}
                   onClick={() => {
                     // If there are non-ID media attachments (not yet uploaded), show confirmation dialog because they are not going to be passed to the new window
@@ -1083,141 +1157,71 @@ function Compose({
                     //   }
                     // }
 
+                    if (!window.opener) {
+                      alert(t`Looks like you closed the parent window.`);
+                      return;
+                    }
+
+                    if (window.opener.__STATES__.showCompose) {
+                      if (window.opener.__STATES__.composerState?.publishing) {
+                        alert(
+                          t`Looks like you already have a compose field open in the parent window and currently publishing. Please wait for it to be done and try again later.`,
+                        );
+                        return;
+                      }
+
+                      let confirmText = t`Looks like you already have a compose field open in the parent window. Popping in this window will discard the changes you made in the parent window. Continue?`;
+                      const yes = confirm(confirmText);
+                      if (!yes) return;
+                    }
+
                     // const mediaAttachmentsWithIDs = mediaAttachments.filter(
                     //   (media) => media.id,
                     // );
 
-                    const newWin = openCompose({
-                      editStatus,
-                      replyToStatus,
-                      draftStatus: {
-                        uid: UID.current,
-                        status: textareaRef.current.value,
-                        spoilerText: spoilerTextRef.current.value,
-                        visibility,
-                        language,
-                        sensitive,
-                        poll,
-                        mediaAttachments,
-                        scheduledAt,
+                    onClose({
+                      fn: () => {
+                        const passData = {
+                          editStatus,
+                          replyToStatus,
+                          replyMode,
+                          draftStatus: {
+                            uid: UID.current,
+                            status: textareaRef.current.value,
+                            spoilerText: spoilerTextRef.current.value,
+                            visibility,
+                            language,
+                            sensitive,
+                            sensitiveMedia,
+                            poll,
+                            mediaAttachments,
+                            scheduledAt,
+                          },
+                          quoteStatus: currentQuoteStatus,
+                        };
+                        window.opener.__COMPOSE__ = passData; // Pass it here instead of `showCompose` due to some weird proxy issue again
+                        if (window.opener.__STATES__.showCompose) {
+                          window.opener.__STATES__.showCompose = false;
+                          setTimeout(() => {
+                            window.opener.__STATES__.showCompose = true;
+                          }, 10);
+                        } else {
+                          window.opener.__STATES__.showCompose = true;
+                        }
+                        if (window.opener.__STATES__.composerState.minimized) {
+                          // Maximize it
+                          window.opener.__STATES__.composerState.minimized = false;
+                        }
                       },
-                      quoteStatus: currentQuoteStatus,
                     });
-
-                    if (!newWin) {
-                      return;
-                    }
-
-                    onClose();
                   }}
                 >
-                  <Icon icon="popout" alt={t`Pop out`} />
+                  <Icon icon="popin" alt={t`Pop in`} />
                 </button>
-              )}
-              <button
-                type="button"
-                class="plain4 min-button"
-                onClick={onMinimize}
-              >
-                <Icon icon="minimize" alt={t`Minimize`} />
-              </button>{' '}
-              <button
-                type="button"
-                class="plain4 close-button"
-                disabled={uiState === 'loading'}
-                onClick={() => {
-                  if (confirmClose()) {
-                    onClose();
-                  }
-                }}
-              >
-                <Icon icon="x" alt={t`Close`} />
-              </button>
-            </span>
-          ) : !inline ? (
-            hasOpener && (
-              <button
-                type="button"
-                class="light pop-button"
-                disabled={uiState === 'loading'}
-                onClick={() => {
-                  // If there are non-ID media attachments (not yet uploaded), show confirmation dialog because they are not going to be passed to the new window
-                  // const containNonIDMediaAttachments =
-                  //   mediaAttachments.length > 0 &&
-                  //   mediaAttachments.some((media) => !media.id);
-                  // if (containNonIDMediaAttachments) {
-                  //   const yes = confirm(
-                  //     'You have media attachments that are not yet uploaded. Opening a new window will discard them and you will need to re-attach them. Are you sure you want to continue?',
-                  //   );
-                  //   if (!yes) {
-                  //     return;
-                  //   }
-                  // }
-
-                  if (!window.opener) {
-                    alert(t`Looks like you closed the parent window.`);
-                    return;
-                  }
-
-                  if (window.opener.__STATES__.showCompose) {
-                    if (window.opener.__STATES__.composerState?.publishing) {
-                      alert(
-                        t`Looks like you already have a compose field open in the parent window and currently publishing. Please wait for it to be done and try again later.`,
-                      );
-                      return;
-                    }
-
-                    let confirmText = t`Looks like you already have a compose field open in the parent window. Popping in this window will discard the changes you made in the parent window. Continue?`;
-                    const yes = confirm(confirmText);
-                    if (!yes) return;
-                  }
-
-                  // const mediaAttachmentsWithIDs = mediaAttachments.filter(
-                  //   (media) => media.id,
-                  // );
-
-                  onClose({
-                    fn: () => {
-                      const passData = {
-                        editStatus,
-                        replyToStatus,
-                        replyMode,
-                        draftStatus: {
-                          uid: UID.current,
-                          status: textareaRef.current.value,
-                          spoilerText: spoilerTextRef.current.value,
-                          visibility,
-                          language,
-                          sensitive,
-                          sensitiveMedia,
-                          poll,
-                          mediaAttachments,
-                          scheduledAt,
-                        },
-                        quoteStatus: currentQuoteStatus,
-                      };
-                      window.opener.__COMPOSE__ = passData; // Pass it here instead of `showCompose` due to some weird proxy issue again
-                      if (window.opener.__STATES__.showCompose) {
-                        window.opener.__STATES__.showCompose = false;
-                        setTimeout(() => {
-                          window.opener.__STATES__.showCompose = true;
-                        }, 10);
-                      } else {
-                        window.opener.__STATES__.showCompose = true;
-                      }
-                      if (window.opener.__STATES__.composerState.minimized) {
-                        // Maximize it
-                        window.opener.__STATES__.composerState.minimized = false;
-                      }
-                    },
-                  });
-                }}
-              >
-                <Icon icon="popin" alt={t`Pop in`} />
-              </button>
-            )
-          ) : null}
-        </div>
+              )
+            ) : null}
+          </div>
+        )}
         {!!replyToStatus && (
           <details class="status-preview" open>
             <Status status={replyToStatus} size="s" previewMode />
