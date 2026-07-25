@@ -205,35 +205,6 @@ body.exp-tab-bar-v2 {
     }
   }
 }
-#shortcuts .tab-bar li #compose-button.shortcut-compose-button {
-  position: static;
-  inset: auto;
-  width: 40px;
-  min-width: 0;
-  height: 40px;
-  min-height: 40px;
-  margin: 8px 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  border-radius: 50%;
-  background-color: var(--button-bg-blur-color);
-  box-shadow: none;
-  color: var(--button-text-color);
-  font-size: 10px;
-  transform: none;
-  opacity: 1;
-
-  span {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
 #shortcuts .tab-bar li a {
   position: relative;
   &:before {
@@ -373,14 +344,6 @@ shortcuts .tab-bar[hidden] {
   #shortcuts .tab-bar li a span {
     text-align: left;
     line-height: 1;
-  }
-  #shortcuts .tab-bar li #compose-button.shortcut-compose-button {
-    width: 36px;
-    height: 36px;
-    min-height: 36px;
-    margin: 4px 0;
-    padding: 0;
-    flex-direction: row;
   }
   #app[data-shortcuts-view-mode='tab-menu-bar'] {
     #shortcuts .tab-bar {

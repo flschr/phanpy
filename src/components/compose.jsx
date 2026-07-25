@@ -167,6 +167,7 @@ function Compose({
   draftStatus,
   quoteStatus,
   standalone,
+  inline,
   hasOpener,
   sharedData,
 }) {
@@ -561,7 +562,7 @@ function Compose({
         }
       })();
     } else {
-      focusTextarea();
+      if (!inline) focusTextarea();
       console.log('Apply prefs', prefs);
       if (prefs['posting:default:visibility']) {
         setVisibility(prefs['posting:default:visibility'].toLowerCase());
@@ -648,10 +649,10 @@ function Compose({
   // focus textarea when state.composerState.minimized turns false
   const snapStates = useSnapshot(states);
   useEffect(() => {
-    if (!snapStates.composerState.minimized) {
+    if (!inline && !snapStates.composerState.minimized) {
       focusTextarea();
     }
-  }, [snapStates.composerState.minimized]);
+  }, [inline, snapStates.composerState.minimized]);
 
   const formRef = useRef();
 
@@ -760,7 +761,7 @@ function Compose({
       // This won't be true if this event is already handled and not propagated 🤞
     },
     {
-      enabled: !supportsCloseWatcher,
+      enabled: !inline && !supportsCloseWatcher,
       enableOnFormTags: true,
       useKey: true,
       ignoreEventWhen: (e) => e.metaKey || e.ctrlKey || e.altKey || e.shiftKey,
@@ -775,7 +776,7 @@ function Compose({
       escDownRef.current = false;
     },
     {
-      enabled: !supportsCloseWatcher,
+      enabled: !inline && !supportsCloseWatcher,
       enableOnFormTags: true,
       // Use keyup because Esc keydown will close the confirm dialog on Safari
       keyup: true,
@@ -796,7 +797,7 @@ function Compose({
     },
   );
   useCloseWatcher(() => {
-    if (!standalone && confirmClose()) {
+    if (!inline && !standalone && confirmClose()) {
       onClose();
     }
   }, []);
@@ -1045,7 +1046,7 @@ function Compose({
       <div
         id="compose-container"
         tabIndex={-1}
-        class={standalone ? 'standalone' : ''}
+        class={`${standalone ? 'standalone' : ''} ${inline ? 'inline' : ''}`}
       >
         <div class="compose-top">
           {currentAccountInfo?.avatarStatic && (
@@ -1061,7 +1062,7 @@ function Compose({
               useAvatarStatic
             />
           )}
-          {!standalone ? (
+          {!standalone && !inline ? (
             <span class="compose-controls">
               {!isPopOutNotSupported && (
                 <button
@@ -1133,7 +1134,7 @@ function Compose({
                 <Icon icon="x" alt={t`Close`} />
               </button>
             </span>
-          ) : (
+          ) : !inline ? (
             hasOpener && (
               <button
                 type="button"
@@ -1215,7 +1216,7 @@ function Compose({
                 <Icon icon="popin" alt={t`Pop in`} />
               </button>
             )
-          )}
+          ) : null}
         </div>
         {!!replyToStatus && (
           <details class="status-preview" open>

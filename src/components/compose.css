@@ -15,6 +15,27 @@
   animation: fade-in 0.2s ease-out;
 }
 
+#compose-container-outer:has(#compose-container.inline) {
+  height: auto;
+  overflow: visible;
+  padding: 0;
+}
+
+#compose-container.inline {
+  width: 100%;
+  padding: 8px;
+
+  .compose-top {
+    position: static;
+    padding: 0 0 8px;
+  }
+
+  form {
+    border-radius: 16px;
+    border: 1px solid var(--outline-color);
+  }
+}
+
 #compose-container .compose-top {
   display: flex;
   justify-content: space-between;

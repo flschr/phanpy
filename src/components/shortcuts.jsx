@@ -17,7 +17,6 @@ import states from '../utils/states';
 
 import AsyncText from './AsyncText';
 import Avatar from './avatar';
-import ComposeButton from './compose-button';
 import Icon from './icon';
 import Link from './link';
 import ListExclusiveBadge from './list-exclusive-badge';
@@ -243,57 +242,51 @@ function Shortcuts() {
 
                   return (
                     <li key={`${i}-${id}-${title}-${subtitle}-${path}`}>
-                      {type === 'compose' ? (
-                        <ComposeButton shortcut />
-                      ) : (
-                        <Link
-                          class={subtitle ? 'has-subtitle' : ''}
-                          to={path}
-                          onClick={(e) => {
-                            if (e.target.classList.contains('is-active')) {
-                              e.preventDefault();
-                              const page = document.getElementById(
-                                `${id}-page`,
-                              );
-                              if (page) {
-                                page.scrollTop = 0;
-                                const updatesButton =
-                                  page.querySelector('.updates-button');
-                                if (updatesButton) {
-                                  updatesButton.click();
-                                }
+                      <Link
+                        class={subtitle ? 'has-subtitle' : ''}
+                        to={path}
+                        onClick={(e) => {
+                          if (e.target.classList.contains('is-active')) {
+                            e.preventDefault();
+                            const page = document.getElementById(`${id}-page`);
+                            if (page) {
+                              page.scrollTop = 0;
+                              const updatesButton =
+                                page.querySelector('.updates-button');
+                              if (updatesButton) {
+                                updatesButton.click();
                               }
                             }
-                          }}
-                          {...extraProps}
-                        >
-                          {altIcon?.url ? (
-                            altIcon?.type === 'avatar' ? (
-                              <Avatar staticUrl={altIcon.url} size="l" />
-                            ) : (
-                              <img
-                                src={altIcon.url}
-                                alt=""
-                                class="shortcut-icon"
-                                loading="lazy"
-                                decoding="async"
-                                fetchPriority="low"
-                              />
-                            )
+                          }
+                        }}
+                        {...extraProps}
+                      >
+                        {altIcon?.url ? (
+                          altIcon?.type === 'avatar' ? (
+                            <Avatar staticUrl={altIcon.url} size="l" />
                           ) : (
-                            <Icon icon={icon} size="xl" />
+                            <img
+                              src={altIcon.url}
+                              alt=""
+                              class="shortcut-icon"
+                              loading="lazy"
+                              decoding="async"
+                              fetchPriority="low"
+                            />
+                          )
+                        ) : (
+                          <Icon icon={icon} size="xl" />
+                        )}
+                        <span>
+                          <AsyncText>{title}</AsyncText>
+                          {subtitle && (
+                            <>
+                              <br />
+                              <small>{subtitle}</small>
+                            </>
                           )}
-                          <span>
-                            <AsyncText>{title}</AsyncText>
-                            {subtitle && (
-                              <>
-                                <br />
-                                <small>{subtitle}</small>
-                              </>
-                            )}
-                          </span>
-                        </Link>
-                      )}
+                        </span>
+                      </Link>
                     </li>
                   );
                 },
@@ -356,21 +349,6 @@ function Shortcuts() {
         >
           {formattedShortcuts.map(
             ({ type, id, path, title, subtitle, icon }, i) => {
-              if (type === 'compose') {
-                return (
-                  <MenuItem
-                    key={`${i}-${id}-${title}`}
-                    onClick={() => {
-                      states.showCompose = true;
-                    }}
-                  >
-                    <Icon icon={icon} size="l" />{' '}
-                    <span class="menu-grow">
-                      <AsyncText>{title}</AsyncText>
-                    </span>
-                  </MenuItem>
-                );
-              }
               if (id === 'lists') {
                 return (
                   <SubMenu2
