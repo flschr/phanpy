@@ -225,6 +225,14 @@ export function groupContext(items, instance) {
       }
     }
 
+    // Don't render a continuation of an author's own thread as a standalone
+    // timeline post when its parent is outside the current page. It remains
+    // available in the status thread and will be grouped normally whenever
+    // the parent is part of the loaded timeline page.
+    if (item.inReplyToId && item.inReplyToAccountId === item.account.id) {
+      return;
+    }
+
     newItems.push(item);
   });
 
