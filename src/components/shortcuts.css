@@ -205,6 +205,33 @@ body.exp-tab-bar-v2 {
     }
   }
 }
+#shortcuts .tab-bar li #compose-button.shortcut-compose-button {
+  position: static;
+  inset: auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 8px;
+  background-color: var(--button-bg-blur-color);
+  box-shadow: none;
+  color: var(--button-text-color);
+  font-size: 10px;
+  transform: none;
+  opacity: 1;
+
+  span {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
 #shortcuts .tab-bar li a {
   position: relative;
   &:before {
@@ -345,6 +372,15 @@ shortcuts .tab-bar[hidden] {
     text-align: left;
     line-height: 1;
   }
+  #shortcuts .tab-bar li #compose-button.shortcut-compose-button {
+    width: auto;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 16px;
+    flex-direction: row;
+    gap: 4px;
+    font-size: 14px;
+  }
   #app[data-shortcuts-view-mode='tab-menu-bar'] {
     #shortcuts .tab-bar {
       transform: none !important;
@@ -355,28 +391,10 @@ shortcuts .tab-bar[hidden] {
     .timeline-deck > header .nav-menu-button {
       display: none;
     }
-
-    #compose-button {
-      top: env(safe-area-inset-top);
-      bottom: auto;
-      inset-inline-end: max(
-        8px,
-        env(safe-area-inset-right),
-        calc((100vw - var(--main-width)) / 2)
-      );
-      min-width: 44px;
-      min-height: 44px;
-      padding: 10px;
-      border-radius: 8px;
-      z-index: 101;
-      transform: none;
-      opacity: 1;
-      box-shadow: none;
-    }
   }
 
   #app:has(#shortcuts .tab-bar:not([hidden]))
-    :is(#home-page, #notifications-page)
+    :is(#home-page, #notifications-page, #account-statuses-page)
     > .timeline-deck
     > header {
     display: none !important;

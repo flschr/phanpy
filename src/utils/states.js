@@ -106,6 +106,16 @@ export function initStates() {
     store.account.get('settings-autoRefresh') ?? false;
   states.settings.shortcutsViewMode =
     store.account.get('settings-shortcutsViewMode') ?? null;
+  if (!store.account.get('migration-composeShortcut')) {
+    if (
+      states.settings.shortcutsViewMode === 'tab-menu-bar' &&
+      !states.shortcuts.some((shortcut) => shortcut?.type === 'compose')
+    ) {
+      states.shortcuts.push({ type: 'compose' });
+      store.account.set('shortcuts', states.shortcuts);
+    }
+    store.account.set('migration-composeShortcut', true);
+  }
   if (store.account.get('settings-shortcutsColumnsMode')) {
     states.settings.shortcutsColumnsMode = true;
   }

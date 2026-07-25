@@ -41,7 +41,7 @@ const fetchLatestPostsMemoized = pmem(
   { expires: 60000 },
 ); // 1 minute cache
 
-export default function ComposeButton() {
+export default function ComposeButton({ shortcut = false, label }) {
   const { t } = useLingui();
   const snapStates = useSnapshot(states);
   const { masto } = api();
@@ -147,18 +147,21 @@ export default function ComposeButton() {
           setMenuOpen(true);
         }}
         {...bindLongPress()}
-        class={`${snapStates.composerState.minimized ? 'min' : ''} ${
+        class={`${shortcut ? 'shortcut-compose-button' : ''} ${
+          snapStates.composerState.minimized ? 'min' : ''
+        } ${
           snapStates.composerState.publishing ? 'loading' : ''
         } ${snapStates.composerState.publishingError ? 'error' : ''}`}
       >
         <Icon icon="quill" size="xl" alt={t`Compose`} />
+        {label && <span>{label}</span>}
       </button>
       <ControlledMenu
         ref={menuRef}
         state={menuOpen ? 'open' : undefined}
         anchorRef={buttonRef}
         onClose={() => setMenuOpen(false)}
-        direction="top"
+        direction={shortcut ? 'bottom' : 'top'}
         gap={8} // Add gap between menu and button
         unmountOnClose
         portal={{

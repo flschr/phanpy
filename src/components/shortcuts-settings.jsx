@@ -32,6 +32,7 @@ import { mediaDevicesSupported } from './qr-code-modal';
 export const SHORTCUTS_LIMIT = 9;
 
 const TYPES = [
+  'compose',
   'following',
   'mentions',
   'notifications',
@@ -47,6 +48,7 @@ const TYPES = [
   // 'account-statuses', // Need @acct search first
 ];
 const TYPE_TEXT = {
+  compose: msg`New post`,
   following: msg`Home / Following`,
   notifications: msg`Notifications`,
   list: msg`Lists`,
@@ -135,6 +137,12 @@ const fetchAccountTitle = pmem(async ({ id }) => {
   return account.username || account.acct || account.displayName;
 });
 export const SHORTCUTS_META = {
+  compose: {
+    id: 'compose',
+    title: msg`New post`,
+    icon: 'quill',
+    excludeViewMode: () => ['multi-column'],
+  },
   following: {
     id: 'home',
     title: (_, index) =>
