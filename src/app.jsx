@@ -13,7 +13,7 @@ import {
   Routes,
   useLocation,
 } from 'react-router-dom';
-import { subscribe } from 'valtio';
+import { subscribe, useSnapshot } from 'valtio';
 import { unstable_enableOp } from 'valtio/vanilla';
 
 // https://github.com/pmndrs/valtio/releases/tag/v2.3.0
@@ -648,7 +648,7 @@ function App() {
       <Routes>
         <Route path="/:instance?/s/:id" element={<StatusRoute />} />
       </Routes>
-      {isLoggedIn && <ComposeButton />}
+      {isLoggedIn && <GlobalComposeButton />}
       {isLoggedIn && <Shortcuts />}
       <Modals />
       {isLoggedIn && <NotificationService />}
@@ -914,3 +914,10 @@ function SecondaryRoutes() {
 }
 
 export { App };
+function GlobalComposeButton() {
+  const snapStates = useSnapshot(states);
+  const composeIsInTabBar =
+    snapStates.settings.shortcutsViewMode === 'tab-menu-bar' &&
+    snapStates.shortcuts.some((shortcut) => shortcut?.type === 'compose');
+  return composeIsInTabBar ? null : <ComposeButton />;
+}

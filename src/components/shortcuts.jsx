@@ -1,7 +1,7 @@
 import './shortcuts.css';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { ControlledMenu, MenuDivider } from '@szhsin/react-menu';
+import { ControlledMenu, MenuDivider, MenuItem } from '@szhsin/react-menu';
 import { memo } from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -17,6 +17,7 @@ import states from '../utils/states';
 
 import AsyncText from './AsyncText';
 import Avatar from './avatar';
+import ComposeButton from './compose-button';
 import Icon from './icon';
 import Link from './link';
 import ListExclusiveBadge from './list-exclusive-badge';
@@ -109,6 +110,7 @@ function Shortcuts() {
       }
 
       return {
+        type,
         id,
         path,
         title,
@@ -216,7 +218,7 @@ function Shortcuts() {
           >
             <ul>
               {formattedShortcuts.map(
-                ({ id, path, title, subtitle, icon, altIcon }, i) => {
+                ({ type, id, path, title, subtitle, icon, altIcon }, i) => {
                   const extraProps =
                     id === 'lists'
                       ? {
@@ -241,51 +243,57 @@ function Shortcuts() {
 
                   return (
                     <li key={`${i}-${id}-${title}-${subtitle}-${path}`}>
-                      <Link
-                        class={subtitle ? 'has-subtitle' : ''}
-                        to={path}
-                        onClick={(e) => {
-                          if (e.target.classList.contains('is-active')) {
-                            e.preventDefault();
-                            const page = document.getElementById(`${id}-page`);
-                            if (page) {
-                              page.scrollTop = 0;
-                              const updatesButton =
-                                page.querySelector('.updates-button');
-                              if (updatesButton) {
-                                updatesButton.click();
+                      {type === 'compose' ? (
+                        <ComposeButton shortcut label={title} />
+                      ) : (
+                        <Link
+                          class={subtitle ? 'has-subtitle' : ''}
+                          to={path}
+                          onClick={(e) => {
+                            if (e.target.classList.contains('is-active')) {
+                              e.preventDefault();
+                              const page = document.getElementById(
+                                `${id}-page`,
+                              );
+                              if (page) {
+                                page.scrollTop = 0;
+                                const updatesButton =
+                                  page.querySelector('.updates-button');
+                                if (updatesButton) {
+                                  updatesButton.click();
+                                }
                               }
                             }
-                          }
-                        }}
-                        {...extraProps}
-                      >
-                        {altIcon?.url ? (
-                          altIcon?.type === 'avatar' ? (
-                            <Avatar staticUrl={altIcon.url} size="l" />
+                          }}
+                          {...extraProps}
+                        >
+                          {altIcon?.url ? (
+                            altIcon?.type === 'avatar' ? (
+                              <Avatar staticUrl={altIcon.url} size="l" />
+                            ) : (
+                              <img
+                                src={altIcon.url}
+                                alt=""
+                                class="shortcut-icon"
+                                loading="lazy"
+                                decoding="async"
+                                fetchPriority="low"
+                              />
+                            )
                           ) : (
-                            <img
-                              src={altIcon.url}
-                              alt=""
-                              class="shortcut-icon"
-                              loading="lazy"
-                              decoding="async"
-                              fetchPriority="low"
-                            />
-                          )
-                        ) : (
-                          <Icon icon={icon} size="xl" />
-                        )}
-                        <span>
-                          <AsyncText>{title}</AsyncText>
-                          {subtitle && (
-                            <>
-                              <br />
-                              <small>{subtitle}</small>
-                            </>
+                            <Icon icon={icon} size="xl" />
                           )}
-                        </span>
-                      </Link>
+                          <span>
+                            <AsyncText>{title}</AsyncText>
+                            {subtitle && (
+                              <>
+                                <br />
+                                <small>{subtitle}</small>
+                              </>
+                            )}
+                          </span>
+                        </Link>
+                      )}
                     </li>
                   );
                 },
@@ -346,52 +354,69 @@ function Shortcuts() {
             </button>
           }
         >
-          {formattedShortcuts.map(({ id, path, title, subtitle, icon }, i) => {
-            if (id === 'lists') {
-              return (
-                <SubMenu2
-                  menuClassName="glass-menu"
-                  overflow="auto"
-                  gap={-8}
-                  label={
-                    <>
-                      <Icon icon={icon} size="l" />
-                      <span class="menu-grow">
-                        <AsyncText>{title}</AsyncText>
-                      </span>
-                      <Icon icon="chevron-right" />
-                    </>
-                  }
-                >
-                  <ListsMenuContent lists={lists} />
-                </SubMenu2>
-              );
-            }
+          {formattedShortcuts.map(
+            ({ type, id, path, title, subtitle, icon }, i) => {
+              if (type === 'compose') {
+                return (
+                  <MenuItem
+                    key={`${i}-${id}-${title}`}
+                    onClick={() => {
+                      states.showCompose = true;
+                    }}
+                  >
+                    <Icon icon={icon} size="l" />{' '}
+                    <span class="menu-grow">
+                      <AsyncText>{title}</AsyncText>
+                    </span>
+                  </MenuItem>
+                );
+              }
+              if (id === 'lists') {
+                return (
+                  <SubMenu2
+                    menuClassName="glass-menu"
+                    overflow="auto"
+                    gap={-8}
+                    label={
+                      <>
+                        <Icon icon={icon} size="l" />
+                        <span class="menu-grow">
+                          <AsyncText>{title}</AsyncText>
+                        </span>
+                        <Icon icon="chevron-right" />
+                      </>
+                    }
+                  >
+                    <ListsMenuContent lists={lists} />
+                  </SubMenu2>
+                );
+              }
 
-            return (
-              <MenuLink
-                to={path}
-                key={`${i}-${id}-${title}-${subtitle}-${path}`}
-                class="glass-menu-item"
-              >
-                <Icon icon={icon} size="l" />{' '}
-                <span class="menu-grow">
-                  <span>
-                    <AsyncText>{title}</AsyncText>
+              return (
+                <MenuLink
+                  to={path}
+                  key={`${i}-${id}-${title}-${subtitle}-${path}`}
+                  class="glass-menu-item"
+                >
+                  <Icon icon={icon} size="l" />{' '}
+                  <span class="menu-grow">
+                    <span>
+                      <AsyncText>{title}</AsyncText>
+                    </span>
+                    {subtitle && (
+                      <>
+                        {' '}
+                        <small class="more-insignificant">{subtitle}</small>
+                      </>
+                    )}
                   </span>
-                  {subtitle && (
-                    <>
-                      {' '}
-                      <small class="more-insignificant">{subtitle}</small>
-                    </>
-                  )}
-                </span>
-                <span class="menu-shortcut hide-until-focus-visible">
-                  {i + 1}
-                </span>
-              </MenuLink>
-            );
-          })}
+                  <span class="menu-shortcut hide-until-focus-visible">
+                    {i + 1}
+                  </span>
+                </MenuLink>
+              );
+            },
+          )}
         </Menu2>
       )}
     </div>

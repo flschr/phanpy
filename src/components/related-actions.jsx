@@ -903,7 +903,7 @@ function RelatedActions({
           {currentAuthenticated && isSelf && standalone ? (
             <>
               <NavMenu
-                buttonClass="button light"
+                buttonClass="light"
                 buttonIcon="gear"
                 buttonLabel={<Trans>Settings</Trans>}
                 direction="top"
