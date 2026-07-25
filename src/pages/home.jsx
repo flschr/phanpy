@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { useSnapshot } from 'valtio';
 
 import Columns from '../components/columns';
+import ComposeSuspense from '../components/compose-suspense';
 import Icon from '../components/icon';
 import Link from '../components/link';
 import Loader from '../components/loader';
@@ -29,6 +30,8 @@ import {
 function Home() {
   const { _ } = useLingui();
   const snapStates = useSnapshot(states);
+  const [inlineComposeKey, setInlineComposeKey] = useState(0);
+  const [timelineRefresh, setTimelineRefresh] = useState(0);
   __BENCHMARK.end('time-to-home');
   useEffect(() => {
     (async () => {
@@ -57,6 +60,18 @@ function Home() {
           id="home"
           headerStart={false}
           headerEnd={<NotificationsLink />}
+          refresh={timelineRefresh}
+          timelineStart={
+            !snapStates.showCompose && (
+              <InlineCompose
+                key={inlineComposeKey}
+                onPublished={() => {
+                  setInlineComposeKey((key) => key + 1);
+                  setTimelineRefresh((refresh) => refresh + 1);
+                }}
+              />
+            )
+          }
         />
       ) : (
         <Following
@@ -65,9 +80,32 @@ function Home() {
           id="home"
           headerStart={false}
           headerEnd={<NotificationsLink />}
+          refresh={timelineRefresh}
+          timelineStart={
+            !snapStates.showCompose && (
+              <InlineCompose
+                key={inlineComposeKey}
+                onPublished={() => {
+                  setInlineComposeKey((key) => key + 1);
+                  setTimelineRefresh((refresh) => refresh + 1);
+                }}
+              />
+            )
+          }
         />
       )}
     </>
+  );
+}
+
+function InlineCompose({ onPublished }) {
+  return (
+    <ComposeSuspense
+      inline
+      onClose={(results) => {
+        if (results?.newStatus) onPublished();
+      }}
+    />
   );
 }
 

@@ -23,7 +23,6 @@ unstable_enableOp(true);
 import './utils/toast-alert';
 
 import BackgroundService from './components/background-service';
-import ComposeButton from './components/compose-button';
 import { ICONS } from './components/ICONS';
 import KeyboardShortcutsHelp from './components/keyboard-shortcuts-help';
 import Loader from './components/loader';
@@ -648,7 +647,6 @@ function App() {
       <Routes>
         <Route path="/:instance?/s/:id" element={<StatusRoute />} />
       </Routes>
-      {isLoggedIn && <GlobalComposeButton />}
       {isLoggedIn && <Shortcuts />}
       <Modals />
       {isLoggedIn && <NotificationService />}
@@ -914,10 +912,3 @@ function SecondaryRoutes() {
 }
 
 export { App };
-function GlobalComposeButton() {
-  const snapStates = useSnapshot(states);
-  const composeIsInTabBar =
-    snapStates.settings.shortcutsViewMode === 'tab-menu-bar' &&
-    snapStates.shortcuts.some((shortcut) => shortcut?.type === 'compose');
-  return composeIsInTabBar ? null : <ComposeButton />;
-}
