@@ -565,14 +565,14 @@ msgstr ""
 msgid "Compose"
 msgstr ""
 
-#: src/components/compose-button.jsx:184
+#: src/components/compose-button.jsx:183
 #: src/components/nav-menu.jsx:291
 #: src/pages/scheduled-posts.jsx:31
 #: src/pages/scheduled-posts.jsx:78
 msgid "Scheduled Posts"
 msgstr "Scheduled Posts"
 
-#: src/components/compose-button.jsx:197
+#: src/components/compose-button.jsx:196
 msgid "Add to thread"
 msgstr "Add to thread"
 

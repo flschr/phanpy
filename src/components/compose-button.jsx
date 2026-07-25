@@ -41,7 +41,7 @@ const fetchLatestPostsMemoized = pmem(
   { expires: 60000 },
 ); // 1 minute cache
 
-export default function ComposeButton({ shortcut = false, label }) {
+export default function ComposeButton({ shortcut = false }) {
   const { t } = useLingui();
   const snapStates = useSnapshot(states);
   const { masto } = api();
@@ -154,7 +154,6 @@ export default function ComposeButton({ shortcut = false, label }) {
         } ${snapStates.composerState.publishingError ? 'error' : ''}`}
       >
         <Icon icon="quill" size="xl" alt={t`Compose`} />
-        {label && <span>{label}</span>}
       </button>
       <ControlledMenu
         ref={menuRef}

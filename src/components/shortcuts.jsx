@@ -244,7 +244,7 @@ function Shortcuts() {
                   return (
                     <li key={`${i}-${id}-${title}-${subtitle}-${path}`}>
                       {type === 'compose' ? (
-                        <ComposeButton shortcut label={title} />
+                        <ComposeButton shortcut />
                       ) : (
                         <Link
                           class={subtitle ? 'has-subtitle' : ''}
