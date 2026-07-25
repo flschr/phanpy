@@ -903,7 +903,7 @@ function RelatedActions({
           {currentAuthenticated && isSelf && standalone ? (
             <>
               <NavMenu
-                buttonClass="light"
+                buttonClass="light profile-action-button"
                 buttonIcon="gear"
                 buttonLabel={<Trans>Settings</Trans>}
                 direction="top"
@@ -911,7 +911,7 @@ function RelatedActions({
               />
               <button
                 type="button"
-                class="light"
+                class="light profile-action-button"
                 onClick={() => {
                   setShowEditProfile(true);
                 }}

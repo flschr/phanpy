@@ -520,6 +520,13 @@
   align-items: center;
 }
 
+.account-container .actions .profile-action-button {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .account-container .account-metadata-box {
   overflow: hidden;
   border-radius: 16px;
